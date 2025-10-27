@@ -1,0 +1,91 @@
+version: '3.8'
+
+name: releasedrop
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: releasedrop-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-releasedrop}
+      POSTGRES_USER: ${POSTGRES_USER:-releasedrop}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-releasedrop}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - releasedrop-network
+
+  # Backend API
+  backend:
+    image: beeetfarmer/releasedrop-backend:latest
+    container_name: releasedrop-backend
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Database
+      DATABASE_URL: postgresql://${POSTGRES_USER:-releasedrop}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-releasedrop}
+      POSTGRES_HOST: db
+      POSTGRES_USER: ${POSTGRES_USER:-releasedrop}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-releasedrop}
+
+      # Spotify (Required)
+      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
+      SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
+
+      # Optional integrations
+      GOTIFY_URL: ${GOTIFY_URL:-}
+      GOTIFY_TOKEN: ${GOTIFY_TOKEN:-}
+
+      NTFY_URL: ${NTFY_URL:-}
+      NTFY_TOPIC: ${NTFY_TOPIC:-}
+      NTFY_USERNAME: ${NTFY_USERNAME:-}
+      NTFY_PASSWORD: ${NTFY_PASSWORD:-}
+
+      LASTFM_API_KEY: ${LASTFM_API_KEY:-}
+      LASTFM_USERNAME: ${LASTFM_USERNAME:-}
+      JELLYFIN_URL: ${JELLYFIN_URL:-}
+      JELLYFIN_API_KEY: ${JELLYFIN_API_KEY:-}
+      PLEX_URL: ${PLEX_URL:-}
+      PLEX_TOKEN: ${PLEX_TOKEN:-}
+
+      # App settings
+      RELEASE_CHECK_TIME: ${RELEASE_CHECK_TIME:-09:00}
+      TIMEZONE: ${TIMEZONE:-UTC}
+      RELEASE_MONTHS_BACK: ${RELEASE_MONTHS_BACK:-3}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+    ports:
+      - "8619:8619"
+    networks:
+      - releasedrop-network
+
+  # Frontend
+  frontend:
+    image: beeetfarmer/releasedrop-frontend:latest
+    container_name: releasedrop-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    networks:
+      - releasedrop-network
+
+networks:
+  releasedrop-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local

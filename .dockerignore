@@ -1,0 +1,47 @@
+# Root .dockerignore
+# (Only used if building from root context - not currently the case)
+
+# Documentation
+*.md
+docs/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*
+!.env.docker.example
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+*.db
+
+# Build artifacts
+backend/dist/
+frontend/dist/
+frontend/build/
+
+# Logs
+*.log
+
+# Docker
+docker-compose.override.yml

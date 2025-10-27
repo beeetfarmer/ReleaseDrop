@@ -1,0 +1,116 @@
+version: '3.8'
+
+name: releasedrop
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: releasedrop-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-releasedrop}
+      POSTGRES_USER: ${POSTGRES_USER:-releasedrop}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-releasedrop}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # ports:
+    #   - "5432:5432"  # Commented out - not needed, containers can access via internal network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-releasedrop}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - releasedrop-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    image: releasedrop-backend:dev
+    container_name: releasedrop-backend
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # Enables host.docker.internal on Linux
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Database
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-releasedrop}
+      POSTGRES_USER: ${POSTGRES_USER:-releasedrop}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-releasedrop}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-releasedrop}:${POSTGRES_PASSWORD:-releasedrop}@db:5432/${POSTGRES_DB:-releasedrop}
+
+      # Spotify
+      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
+      SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
+
+      # Gotify
+      GOTIFY_URL: ${GOTIFY_URL:-}
+      GOTIFY_TOKEN: ${GOTIFY_TOKEN:-}
+
+      # Ntfy
+      NTFY_URL: ${NTFY_URL:-}
+      NTFY_TOPIC: ${NTFY_TOPIC:-}
+      NTFY_USERNAME: ${NTFY_USERNAME:-}
+      NTFY_PASSWORD: ${NTFY_PASSWORD:-}
+
+      # Optional integrations
+      LASTFM_API_KEY: ${LASTFM_API_KEY:-}
+      LASTFM_USERNAME: ${LASTFM_USERNAME:-}
+      JELLYFIN_URL: ${JELLYFIN_URL:-}
+      JELLYFIN_API_KEY: ${JELLYFIN_API_KEY:-}
+      PLEX_URL: ${PLEX_URL:-}
+      PLEX_TOKEN: ${PLEX_TOKEN:-}
+
+      # App settings
+      RELEASE_CHECK_TIME: ${RELEASE_CHECK_TIME:-09:00}
+      TIMEZONE: ${TIMEZONE:-UTC}
+      RELEASE_MONTHS_BACK: ${RELEASE_MONTHS_BACK:-3}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+    volumes:
+      # Bind mount for hot reload
+      - ./backend:/app
+      # Exclude these directories
+      - /app/venv
+      - /app/__pycache__
+    ports:
+      - "8619:8619"
+    networks:
+      - releasedrop-network
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    image: releasedrop-frontend:dev
+    container_name: releasedrop-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    # environment:
+      # - VITE_API_URL=http://localhost:8619  # Commented out to use dynamic hostname detection
+    volumes:
+      # Bind mount for hot reload - REMOVE IN PRODUCTION
+      - ./frontend:/app
+      # Exclude these directories
+      - /app/node_modules
+      - /app/dist
+    ports:
+      - "3000:3000"
+    networks:
+      - releasedrop-network
+
+networks:
+  releasedrop-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
