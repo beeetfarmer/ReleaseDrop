@@ -4,6 +4,8 @@ A self-hosted web application to track your favorite artists and get notified of
 
 ![ReleaseDrop Screenshot](screenshots/latest-releases-1.png)
 
+For more screenshots: [screenshots folder](screenshots/)
+
 ## Features
 
 - **Track Artists** - Follow your favorite artists
@@ -54,7 +56,7 @@ docker-compose up -d
 ### Reference
 - [API Reference](docs/API.md) - API endpoints documentation
 
-## Contributing
+## Contribution And Help
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
