@@ -14,11 +14,6 @@ FastAPI provides automatic interactive API documentation:
 - **Swagger UI**: http://localhost:8619/docs
 - **ReDoc**: http://localhost:8619/redoc
 
-## Authentication
-
-Currently, the API does not require authentication.
----
-
 ## Artists Endpoints
 
 ### Search Artists
