@@ -16,9 +16,16 @@ A full-stack web application to track your favorite artists and get notified of 
 ## Quick Start
 
 ```bash
-# 1. Configure
+# 1. Create new folder
+mkdir releasedrop
+cd releasedrop
+
+#Download the docker-compose.yml and example.env
+wget https://github.com/beeetfarmer/ReleaseDrop/blob/main/docker-compose.yml
+wget https://github.com/beeetfarmer/ReleaseDrop/blob/main/.env.docker.example
+
 cp .env.docker.example .env
-# Edit .env with your Spotify credentials
+# Edit .env with atleast your Spotify credentials
 
 # 2. Start
 docker-compose up -d
