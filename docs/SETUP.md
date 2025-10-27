@@ -12,9 +12,9 @@ Before you begin, ensure you have the following:
 3. **Spotify Developer Account** - For API access
 
 **Optional:**
-4. **Gotify or Ntfy Server** - For push notifications (app works without this)
-5. **Jellyfin/Plex Server** - For library integration
-6. **Last.fm API Key** - For importing top artists
+**Gotify or Ntfy Server** - For push notifications (app works without this)
+**Jellyfin/Plex Server** - For library integration
+**Last.fm API Key** - For importing top artists
 
 ## Getting API Credentials
 
