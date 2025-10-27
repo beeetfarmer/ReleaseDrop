@@ -1,7 +1,8 @@
 # ReleaseDrop
 
-A full-stack web application to track your favorite artists and get notified of their latest releases. Automatically checks for new music daily and integrates with your Jellyfin and Plex media servers.
+A self-hosted web application to track your favorite artists and get notified of their latest releases. Automatically checks for new music daily and integrates with your Jellyfin and Plex media servers.
 
+![ReleaseDrop Screenshot](screenshots/latest-releases-1.png)
 
 ## Features
 
@@ -56,7 +57,5 @@ docker-compose up -d
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
----
 
 **Need help?** Check the docs or [open an issue](https://github.com/beeetfarmer/releasedrop/issues).
