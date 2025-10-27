@@ -23,11 +23,10 @@ For more screenshots: [screenshots folder](screenshots/)
 mkdir releasedrop
 cd releasedrop
 
-#Download the docker-compose.yml and example.env
-wget https://github.com/beeetfarmer/ReleaseDrop/blob/main/docker-compose.yml
-wget https://github.com/beeetfarmer/ReleaseDrop/blob/main/.env.docker.example
+# Download docker-compose.yml and .env files
+wget https://raw.githubusercontent.com/beeetfarmer/ReleaseDrop/main/docker-compose.yml
+wget https://raw.githubusercontent.com/beeetfarmer/ReleaseDrop/main/.env.docker.example -O .env
 
-cp .env.docker.example .env
 # Edit .env with atleast your Spotify credentials
 
 # 2. Start
